@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /surveys/{surveyId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+
+      match /responses/{responseId} {
+        // Anyone with the survey link can submit one response document.
+        allow create: if true;
+        // Only logged-in managers can read/list responses (results page).
+        allow read: if request.auth != null;
+        allow update, delete: if false;
+      }
+    }
+  }
+}
