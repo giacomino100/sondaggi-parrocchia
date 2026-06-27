@@ -2,32 +2,26 @@
 
 App web per creare e gestire sondaggi: i gestori (autenticati) creano i sondaggi e ne vedono i risultati, chiunque riceva il link può rispondere senza bisogno di account.
 
-Stack: React + Vite, Firebase (Auth, Firestore, Hosting). Il deploy su Firebase Hosting avviene automaticamente ad ogni push sul branch `main` tramite GitHub Actions.
+Stack: React + Vite, Firebase (Auth, Firestore, Hosting, Analytics). Progetto Firebase: **sondaggio-87457**. Il deploy su Firebase Hosting avviene automaticamente ad ogni push sul branch `main` tramite GitHub Actions.
 
-## 1. Creare il progetto Firebase
+## 1. Completare la configurazione su Firebase Console
 
-1. Vai su [console.firebase.google.com](https://console.firebase.google.com) e crea un nuovo progetto (es. `sondaggi-parrocchia`).
-2. **Authentication** → tab "Sign-in method" → abilita **Email/Password**.
-3. **Authentication** → tab "Users" → aggiungi manualmente un utente (email + password) per ogni persona che dovrà gestire i sondaggi. Non esiste una registrazione pubblica: gli account dei gestori si creano solo da qui.
-4. **Firestore Database** → crea il database (modalità produzione, scegli una region es. `europe-west`).
-5. **Project settings** (icona ingranaggio) → "Your apps" → aggiungi una **Web app**. Copia i valori di configurazione (`apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`): serviranno sia in locale che nei secret di GitHub.
-6. **Project settings** → "Service accounts" → "Generate new private key". Scarica il file JSON: serve per permettere a GitHub Actions di fare il deploy.
+Il progetto `sondaggio-87457` e la config web sono già impostati nel codice (`src/lib/firebase.js`). Restano da fare, su [console.firebase.google.com](https://console.firebase.google.com/project/sondaggio-87457):
+
+1. **Authentication** → tab "Sign-in method" → abilita **Email/Password**.
+2. **Authentication** → tab "Users" → aggiungi manualmente un utente (email + password) per ogni persona che dovrà gestire i sondaggi. Non esiste una registrazione pubblica: gli account dei gestori si creano solo da qui.
+3. **Firestore Database** → crea il database, se non esiste già (modalità produzione, scegli una region es. `europe-west`).
+4. **Project settings** → "Service accounts" → "Generate new private key". Scarica il file JSON: serve solo per permettere a GitHub Actions di fare il deploy (non va mai committato nel repo).
 
 ## 2. Configurare il repository GitHub
 
-Nel repository, vai su **Settings → Secrets and variables → Actions → New repository secret** e crea questi secret:
+Nel repository, vai su **Settings → Secrets and variables → Actions → New repository secret** e crea:
 
 | Secret | Valore |
 | --- | --- |
-| `VITE_FIREBASE_API_KEY` | dal config web Firebase |
-| `VITE_FIREBASE_AUTH_DOMAIN` | dal config web Firebase |
-| `VITE_FIREBASE_PROJECT_ID` | dal config web Firebase (es. `sondaggi-parrocchia`) |
-| `VITE_FIREBASE_STORAGE_BUCKET` | dal config web Firebase |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | dal config web Firebase |
-| `VITE_FIREBASE_APP_ID` | dal config web Firebase |
-| `FIREBASE_SERVICE_ACCOUNT` | contenuto completo del file JSON scaricato al punto 6 |
+| `FIREBASE_SERVICE_ACCOUNT` | contenuto completo del file JSON scaricato al punto 1.4 |
 
-Aggiorna anche `.firebaserc` in questo repo sostituendo `YOUR_FIREBASE_PROJECT_ID` con l'ID reale del progetto Firebase.
+Non servono altri secret: la config web Firebase (`apiKey`, `projectId`, ecc.) non è sensibile ed è già nel codice.
 
 Il workflow [`.github/workflows/firebase-deploy.yml`](.github/workflows/firebase-deploy.yml) fa automaticamente, ad ogni push su `main`: build dell'app, deploy delle regole Firestore e deploy su Firebase Hosting.
 
@@ -35,7 +29,6 @@ Il workflow [`.github/workflows/firebase-deploy.yml`](.github/workflows/firebase
 
 ```bash
 npm install
-cp .env.example .env.local   # poi compila .env.local con i valori del config Firebase
 npm run dev
 ```
 
