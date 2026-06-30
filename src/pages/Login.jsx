@@ -31,35 +31,51 @@ export default function Login() {
   }
 
   return (
-    <div className="page page-narrow">
-      <h1>Accesso gestori</h1>
-      <p className="muted">
-        Area riservata a chi crea e gestisce i sondaggi della parrocchia.
-      </p>
-      <form className="card" onSubmit={handleSubmit}>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={submitting}>
-          {submitting ? 'Accesso...' : 'Accedi'}
-        </button>
-      </form>
+    <div className="wrap">
+      <div className="card">
+        <div className="card__bar"></div>
+
+        <header className="hero">
+          <span className="eyebrow">Area gestori</span>
+          <h1 className="hero__title">Accesso</h1>
+          <p className="hero__desc">
+            Riservata a chi crea e gestisce i sondaggi della parrocchia.
+          </p>
+        </header>
+
+        <form className="body" onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="email">Email <span className="req">*</span></label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="password">Password <span className="req">*</span></label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {error && <p className="alert">{error}</p>}
+
+          <button type="submit" className="btn btn--primary btn--block" disabled={submitting}>
+            {submitting ? 'Accesso…' : 'Accedi'}
+          </button>
+        </form>
+      </div>
+
+      <p className="foot">Parrocchia · Sondaggi</p>
     </div>
   )
 }

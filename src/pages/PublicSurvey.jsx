@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { submitResponse, watchSurvey } from '../lib/surveys'
+import PublicRsvp from '../components/PublicRsvp'
 
 function votedKey(surveyId) {
   return `sondaggio-votato-${surveyId}`
@@ -56,75 +57,125 @@ export default function PublicSurvey() {
     }
   }
 
-  if (survey === undefined) return <p className="status">Caricamento...</p>
-  if (survey === null) return <p className="status">Sondaggio non trovato.</p>
-  if (survey.status !== 'open') {
+  if (survey === undefined) return <p className="status">Caricamento…</p>
+
+  if (survey?.surveyType === 'rsvp') {
+    return <PublicRsvp survey={survey} surveyId={surveyId} />
+  }
+
+  if (survey === null) {
     return (
-      <div className="page page-narrow">
-        <h1>{survey.title}</h1>
-        <p className="muted">Questo sondaggio non è più aperto alle risposte.</p>
+      <div className="wrap">
+        <div className="card">
+          <div className="card__bar"></div>
+          <header className="hero">
+            <span className="eyebrow">Sondaggio</span>
+            <h1 className="hero__title">Sondaggio non trovato</h1>
+            <p className="hero__desc">Il link potrebbe non essere più valido.</p>
+          </header>
+        </div>
+        <p className="foot">Parrocchia · Sondaggi</p>
       </div>
     )
   }
-  if (hasVoted) {
-    return (
-      <div className="page page-narrow">
-        <h1>{survey.title}</h1>
-        <p>Grazie, la tua risposta è stata registrata.</p>
-      </div>
-    )
-  }
+
+  const closed = survey.status !== 'open'
 
   return (
-    <div className="page page-narrow">
-      <h1>{survey.title}</h1>
-      {survey.description && <p className="muted">{survey.description}</p>}
+    <div className="wrap">
+      <div className="card">
+        <div className="card__bar"></div>
 
-      <form className="card" onSubmit={handleSubmit}>
-        {survey.questions.map((question) => (
-          <fieldset key={question.id} className="question-card">
-            <legend>{question.text}</legend>
+        <header className="hero">
+          <span className="eyebrow">Sondaggio</span>
+          <h1 className="hero__title">{survey.title}</h1>
+          {survey.description && <p className="hero__desc">{survey.description}</p>}
+        </header>
 
-            {question.type === 'text' && (
-              <input
-                value={answers[question.id] ?? ''}
-                onChange={(e) => setAnswer(question.id, e.target.value)}
-              />
-            )}
+        {hasVoted ? (
+          <div className="body" style={{ textAlign: 'center', alignItems: 'center' }}>
+            <div className="done">✓</div>
+            <h2 style={{ fontSize: '1.4rem' }}>Grazie!</h2>
+            <p className="muted" style={{ margin: 0 }}>
+              La tua risposta è stata registrata.
+            </p>
+          </div>
+        ) : closed ? (
+          <div className="body">
+            <p className="muted" style={{ margin: 0 }}>
+              Questo sondaggio non è più aperto alle risposte.
+            </p>
+          </div>
+        ) : (
+          <form className="body" onSubmit={handleSubmit}>
+            {survey.questions.map((question) => (
+              <fieldset key={question.id} className="q-block">
+                <legend className="q-title">{question.text}</legend>
 
-            {question.type === 'single' &&
-              question.options.map((option) => (
-                <label key={option} className="option-choice">
-                  <input
-                    type="radio"
-                    name={question.id}
-                    checked={answers[question.id] === option}
-                    onChange={() => setAnswer(question.id, option)}
+                {question.type === 'text' && (
+                  <textarea
+                    rows={2}
+                    placeholder="Scrivi la tua risposta…"
+                    value={answers[question.id] ?? ''}
+                    onChange={(e) => setAnswer(question.id, e.target.value)}
                   />
-                  {option}
-                </label>
-              ))}
+                )}
 
-            {question.type === 'multiple' &&
-              question.options.map((option) => (
-                <label key={option} className="option-choice">
-                  <input
-                    type="checkbox"
-                    checked={(answers[question.id] ?? []).includes(option)}
-                    onChange={() => toggleMultiple(question.id, option)}
-                  />
-                  {option}
-                </label>
-              ))}
-          </fieldset>
-        ))}
+                {question.type === 'single' && (
+                  <div className="choices">
+                    {question.options.map((option) => {
+                      const selected = answers[question.id] === option
+                      return (
+                        <label
+                          key={option}
+                          className={`choice${selected ? ' choice--selected' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name={question.id}
+                            checked={selected}
+                            onChange={() => setAnswer(question.id, option)}
+                          />
+                          {option}
+                        </label>
+                      )
+                    })}
+                  </div>
+                )}
 
-        {error && <p className="error">{error}</p>}
+                {question.type === 'multiple' && (
+                  <div className="choices">
+                    {question.options.map((option) => {
+                      const selected = (answers[question.id] ?? []).includes(option)
+                      return (
+                        <label
+                          key={option}
+                          className={`choice${selected ? ' choice--selected' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleMultiple(question.id, option)}
+                          />
+                          {option}
+                        </label>
+                      )
+                    })}
+                  </div>
+                )}
+              </fieldset>
+            ))}
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? 'Invio...' : 'Invia risposta'}
-        </button>
-      </form>
+            {error && <p className="alert">{error}</p>}
+
+            <button type="submit" className="btn btn--primary btn--block" disabled={submitting}>
+              {submitting ? 'Invio in corso…' : 'Invia risposta'}
+            </button>
+          </form>
+        )}
+      </div>
+
+      <p className="foot">Parrocchia · Sondaggi</p>
     </div>
   )
 }

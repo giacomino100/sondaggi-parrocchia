@@ -44,6 +44,17 @@ export async function createSurvey({ title, description, questions, uid }) {
   })
 }
 
+export async function createRsvpSurvey({ title, description, uid }) {
+  return addDoc(surveysRef, {
+    title,
+    description,
+    surveyType: 'rsvp',
+    status: 'open',
+    createdBy: uid,
+    createdAt: serverTimestamp(),
+  })
+}
+
 export async function updateSurvey(surveyId, data) {
   return updateDoc(doc(db, 'surveys', surveyId), data)
 }
@@ -68,6 +79,21 @@ export async function submitResponse(surveyId, answers) {
     answers,
     submittedAt: serverTimestamp(),
   })
+}
+
+export async function submitRsvpResponse(surveyId, data) {
+  return addDoc(collection(db, 'surveys', surveyId, 'responses'), {
+    ...data,
+    submittedAt: serverTimestamp(),
+  })
+}
+
+export async function updateResponse(surveyId, responseId, data) {
+  return updateDoc(doc(db, 'surveys', surveyId, 'responses', responseId), data)
+}
+
+export async function deleteResponse(surveyId, responseId) {
+  return deleteDoc(doc(db, 'surveys', surveyId, 'responses', responseId))
 }
 
 export function makeQuestionId() {
