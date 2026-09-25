@@ -6,6 +6,9 @@ import TemplateSelector from './pages/TemplateSelector'
 import SurveyEditor from './pages/SurveyEditor'
 import SurveyResults from './pages/SurveyResults'
 import PublicSurvey from './pages/PublicSurvey'
+import Registrations from './pages/Registrations'
+import RegistrationEntries from './pages/RegistrationEntries'
+import PublicRegistration from './pages/PublicRegistration'
 
 export default function App() {
   return (
@@ -32,6 +35,15 @@ export default function App() {
       <Route
         path="/sondaggi/:surveyId/risultati"
         element={<ProtectedRoute><SurveyResults /></ProtectedRoute>}
+      />
+      <Route path="/i/:registrationId" element={<PublicRegistration />} />
+      <Route
+        path="/iscrizioni"
+        element={<ProtectedRoute><Registrations /></ProtectedRoute>}
+      />
+      <Route
+        path="/iscrizioni/:registrationId"
+        element={<ProtectedRoute><RegistrationEntries /></ProtectedRoute>}
       />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

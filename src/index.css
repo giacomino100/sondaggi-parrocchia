@@ -1114,3 +1114,123 @@ a {
   flex-direction: column;
   gap: 16px;
 }
+
+/* ===== Navigazione sezioni ===== */
+.section-nav {
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  margin-bottom: 18px;
+  background: var(--bianco);
+  border: 1px solid var(--bordo);
+  border-radius: 14px;
+  box-shadow: var(--ombra-sm);
+}
+
+.section-nav__tab {
+  flex: 1 1 0;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--testo-soft);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.section-nav__tab:hover {
+  color: var(--accent);
+}
+
+.section-nav__tab--active {
+  background: var(--accent-soft);
+  color: var(--accent-scuro);
+}
+
+/* ===== Modulo iscrizione ===== */
+.form-section {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-scuro);
+  padding-top: 6px;
+  border-top: 1px solid var(--bordo);
+}
+
+.form-section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* ===== Elenco iscritti ===== */
+.iscr-elenco {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .iscr-elenco {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.iscr-riga {
+  background: var(--campo);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.iscr-riga__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.iscr-riga__head > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.iscr-nome {
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.iscr-nascita {
+  font-size: 0.78rem;
+  color: var(--testo-soft);
+}
+
+.iscr-dati {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.iscr-dati dt {
+  color: var(--testo-soft);
+  font-weight: 600;
+}
+
+.iscr-dati dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.iscr-dati a {
+  text-decoration: none;
+}

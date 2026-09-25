@@ -1,52 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { QRCodeCanvas } from 'qrcode.react'
 import { useAuth } from '../contexts/AuthContext'
 import { deleteSurvey, setSurveyStatus, watchSurveys } from '../lib/surveys'
-
-function QrModal({ survey, onClose }) {
-  const canvasRef = useRef(null)
-  const url = `${window.location.origin}/s/${survey.id}`
-
-  function download() {
-    const canvas = document.getElementById('qr-canvas')
-    if (!canvas) return
-    const link = document.createElement('a')
-    link.download = `qr-${survey.title.replace(/\s+/g, '-').toLowerCase()}.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
-  }
-
-  return (
-    <div className="overlay" onClick={onClose}>
-      <div className="dialog dialog--small" onClick={(e) => e.stopPropagation()}>
-        <h2 className="dialog__title">QR Code</h2>
-        <p className="dialog__testo">{survey.title}</p>
-
-        <div className="qr-wrap">
-          <QRCodeCanvas
-            id="qr-canvas"
-            value={url}
-            size={220}
-            includeMargin
-            level="M"
-            fgColor="#1d1c2b"
-            bgColor="#ffffff"
-          />
-        </div>
-
-        <p className="qr-url">{url}</p>
-
-        <div className="dialog__azioni">
-          <button className="btn btn--ghost" type="button" onClick={onClose}>Chiudi</button>
-          <button className="btn btn--primary" type="button" onClick={download}>
-            ↓ Scarica PNG
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+import QrModal from '../components/QrModal'
+import SectionNav from '../components/SectionNav'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
@@ -86,6 +43,8 @@ export default function Dashboard() {
           <button className="btn btn--ghost btn--sm" onClick={logout}>Esci</button>
         </div>
       </div>
+
+      <SectionNav />
 
       {surveys.length === 0 ? (
         <p className="empty">Nessun sondaggio creato finora.</p>
@@ -150,7 +109,13 @@ export default function Dashboard() {
         </ul>
       )}
 
-      {qrSurvey && <QrModal survey={qrSurvey} onClose={() => setQrSurvey(null)} />}
+      {qrSurvey && (
+        <QrModal
+          title={qrSurvey.title}
+          url={`${window.location.origin}/s/${qrSurvey.id}`}
+          onClose={() => setQrSurvey(null)}
+        />
+      )}
     </div>
   )
 }
