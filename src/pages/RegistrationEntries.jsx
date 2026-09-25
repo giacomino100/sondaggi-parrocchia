@@ -187,7 +187,7 @@ export default function RegistrationEntries() {
           </div>
         </div>
 
-        <p className="foot">Parrocchia · Iscrizioni</p>
+        <p className="foot">Parrocchia di San Gioacchino · Partinico</p>
       </div>
 
       {showQr && <QrModal title={registration.title} url={url} onClose={() => setShowQr(false)} />}

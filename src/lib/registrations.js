@@ -36,6 +36,10 @@ export async function createRegistration({ title, description, uid }) {
   })
 }
 
+export async function updateRegistration(registrationId, data) {
+  return updateDoc(doc(db, 'registrations', registrationId), data)
+}
+
 export async function setRegistrationStatus(registrationId, status) {
   return updateDoc(doc(db, 'registrations', registrationId), { status })
 }

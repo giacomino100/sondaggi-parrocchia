@@ -2,6 +2,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function validText(value, maxLen) {
+      return value is string && value.size() > 0 && value.size() <= maxLen;
+    }
+
     match /surveys/{surveyId} {
       allow read: if true;
       allow create, update, delete: if request.auth != null;
@@ -19,8 +23,21 @@ service cloud.firestore {
       // I genitori possono solo inviare l'iscrizione; i dati li vede solo chi è loggato
       match /entries/{entryId} {
         allow create: if get(/databases/$(database)/documents/registrations/$(registrationId)).data.status == 'open'
+          && request.resource.data.keys().hasOnly([
+               'nomeGenitore', 'cognomeGenitore', 'cellulare', 'email', 'indirizzo',
+               'nomeBambino', 'cognomeBambino', 'dataNascita',
+               'consensoFoto', 'consensoPrivacy', 'submittedAt'])
+          && validText(request.resource.data.nomeGenitore, 60)
+          && validText(request.resource.data.cognomeGenitore, 60)
+          && validText(request.resource.data.cellulare, 30)
+          && validText(request.resource.data.email, 120)
+          && validText(request.resource.data.indirizzo, 200)
+          && validText(request.resource.data.nomeBambino, 60)
+          && validText(request.resource.data.cognomeBambino, 60)
+          && validText(request.resource.data.dataNascita, 10)
+          && request.resource.data.consensoFoto is bool
           && request.resource.data.consensoPrivacy == true
-          && request.resource.data.consensoFoto is bool;
+          && request.resource.data.submittedAt == request.time;
         allow read, update, delete: if request.auth != null;
       }
     }

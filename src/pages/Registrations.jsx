@@ -5,6 +5,7 @@ import {
   createRegistration,
   deleteRegistration,
   setRegistrationStatus,
+  updateRegistration,
   watchRegistrations,
 } from '../lib/registrations'
 import QrModal from '../components/QrModal'
@@ -21,34 +22,43 @@ function defaultTitle() {
   return `Iscrizioni ACR ${start}/${start + 1}`
 }
 
-function CreateModal({ onClose }) {
+const DEFAULT_DESCRIPTION =
+  "Iscrizioni all'ACR (Azione Cattolica Ragazzi) della Parrocchia di San Gioacchino di Partinico. " +
+  'Compila il modulo per iscrivere tuo figlio/a al nuovo anno.'
+
+// Senza `registration` crea una nuova iscrizione, altrimenti modifica quella esistente
+function RegistrationModal({ registration, onClose }) {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [title, setTitle] = useState(defaultTitle)
-  const [description, setDescription] = useState(
-    "Compila il modulo per iscrivere tuo figlio/a al nuovo anno dell'Azione Cattolica Ragazzi.",
-  )
+  const [title, setTitle] = useState(registration?.title ?? defaultTitle)
+  const [description, setDescription] = useState(registration?.description ?? DEFAULT_DESCRIPTION)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  async function handleCreate(e) {
+  async function handleSave(e) {
     e.preventDefault()
     if (!title.trim()) { setError('Il titolo è obbligatorio.'); return }
     setSaving(true)
     setError('')
+    const data = { title: title.trim(), description: description.trim() }
     try {
-      const ref = await createRegistration({ title: title.trim(), description: description.trim(), uid: user.uid })
-      navigate(`/iscrizioni/${ref.id}`)
+      if (registration) {
+        await updateRegistration(registration.id, data)
+        onClose()
+      } else {
+        const ref = await createRegistration({ ...data, uid: user.uid })
+        navigate(`/iscrizioni/${ref.id}`)
+      }
     } catch {
-      setError('Creazione non riuscita. Riprova.')
+      setError('Salvataggio non riuscito. Riprova.')
       setSaving(false)
     }
   }
 
   return (
     <div className="overlay" onClick={onClose}>
-      <form className="dialog" onClick={(e) => e.stopPropagation()} onSubmit={handleCreate}>
-        <h2 className="dialog__title">Nuova iscrizione</h2>
+      <form className="dialog" onClick={(e) => e.stopPropagation()} onSubmit={handleSave}>
+        <h2 className="dialog__title">{registration ? 'Modifica iscrizione' : 'Nuova iscrizione'}</h2>
         <div className="field">
           <label htmlFor="reg-title">Titolo <span className="req">*</span></label>
           <input id="reg-title" value={title} onChange={(e) => setTitle(e.target.value)} required />
@@ -61,7 +71,7 @@ function CreateModal({ onClose }) {
         <div className="dialog__azioni">
           <button className="btn btn--ghost" type="button" onClick={onClose} disabled={saving}>Annulla</button>
           <button className="btn btn--primary" type="submit" disabled={saving}>
-            {saving ? 'Creazione…' : 'Crea iscrizione'}
+            {saving ? 'Salvataggio…' : registration ? 'Salva' : 'Crea iscrizione'}
           </button>
         </div>
       </form>
@@ -75,6 +85,7 @@ export default function Registrations() {
   const [copiedId, setCopiedId] = useState(null)
   const [qrRegistration, setQrRegistration] = useState(null)
   const [creating, setCreating] = useState(false)
+  const [editing, setEditing] = useState(null)
 
   useEffect(() => watchRegistrations(setRegistrations), [])
 
@@ -147,6 +158,9 @@ export default function Registrations() {
                   <Link className="btn btn--soft btn--sm" to={`/iscrizioni/${registration.id}`}>
                     👥 Iscritti
                   </Link>
+                  <button className="btn btn--ghost btn--sm" onClick={() => setEditing(registration)}>
+                    Modifica
+                  </button>
                   <button className="btn btn--ghost btn--sm" onClick={() => copyLink(registration.id)}>
                     {copiedId === registration.id ? 'Link copiato ✓' : 'Copia link'}
                   </button>
@@ -163,7 +177,8 @@ export default function Registrations() {
         </ul>
       )}
 
-      {creating && <CreateModal onClose={() => setCreating(false)} />}
+      {creating && <RegistrationModal onClose={() => setCreating(false)} />}
+      {editing && <RegistrationModal registration={editing} onClose={() => setEditing(null)} />}
       {qrRegistration && (
         <QrModal
           title={qrRegistration.title}

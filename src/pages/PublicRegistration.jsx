@@ -17,7 +17,7 @@ function sentKey(registrationId) {
   return `iscrizione-inviata-${registrationId}`
 }
 
-function Shell({ eyebrow = 'Iscrizione', title, description, children }) {
+function Shell({ eyebrow = 'Iscrizione ACR', title, description, children }) {
   return (
     <div className="wrap">
       <div className="card">
@@ -29,7 +29,7 @@ function Shell({ eyebrow = 'Iscrizione', title, description, children }) {
         </header>
         {children}
       </div>
-      <p className="foot">Parrocchia · Iscrizioni</p>
+      <p className="foot">Parrocchia di San Gioacchino · Partinico</p>
     </div>
   )
 }
@@ -132,36 +132,36 @@ export default function PublicRegistration() {
         <div className="row">
           <div className="field">
             <label htmlFor="nomeGenitore">Nome <span className="req">*</span></label>
-            <input id="nomeGenitore" type="text" autoComplete="given-name" value={form.nomeGenitore} onChange={set('nomeGenitore')} required />
+            <input id="nomeGenitore" maxLength={60} type="text" autoComplete="given-name" value={form.nomeGenitore} onChange={set('nomeGenitore')} required />
           </div>
           <div className="field">
             <label htmlFor="cognomeGenitore">Cognome <span className="req">*</span></label>
-            <input id="cognomeGenitore" type="text" autoComplete="family-name" value={form.cognomeGenitore} onChange={set('cognomeGenitore')} required />
+            <input id="cognomeGenitore" maxLength={60} type="text" autoComplete="family-name" value={form.cognomeGenitore} onChange={set('cognomeGenitore')} required />
           </div>
         </div>
         <div className="field">
           <label htmlFor="cellulare">Cellulare <span className="req">*</span></label>
-          <input id="cellulare" type="tel" inputMode="tel" autoComplete="tel" placeholder="Es. 333 1234567" value={form.cellulare} onChange={set('cellulare')} required />
+          <input id="cellulare" maxLength={30} type="tel" inputMode="tel" autoComplete="tel" placeholder="Es. 333 1234567" value={form.cellulare} onChange={set('cellulare')} required />
         </div>
         <div className="field">
           <label htmlFor="email">Email <span className="req">*</span></label>
-          <input id="email" type="email" inputMode="email" autoComplete="email" placeholder="nome@esempio.it" value={form.email} onChange={set('email')} required />
+          <input id="email" maxLength={120} type="email" inputMode="email" autoComplete="email" placeholder="nome@esempio.it" value={form.email} onChange={set('email')} required />
           {form.email.trim() && !emailValid && <p className="hint hint--error">Indirizzo email non valido.</p>}
         </div>
         <div className="field">
           <label htmlFor="indirizzo">Indirizzo di residenza <span className="req">*</span></label>
-          <input id="indirizzo" type="text" autoComplete="street-address" placeholder="Via, numero civico, comune" value={form.indirizzo} onChange={set('indirizzo')} required />
+          <input id="indirizzo" maxLength={200} type="text" autoComplete="street-address" placeholder="Via, numero civico, comune" value={form.indirizzo} onChange={set('indirizzo')} required />
         </div>
 
         <h2 className="form-section">Dati del bambino/a</h2>
         <div className="row">
           <div className="field">
             <label htmlFor="nomeBambino">Nome <span className="req">*</span></label>
-            <input id="nomeBambino" type="text" autoComplete="off" value={form.nomeBambino} onChange={set('nomeBambino')} required />
+            <input id="nomeBambino" maxLength={60} type="text" autoComplete="off" value={form.nomeBambino} onChange={set('nomeBambino')} required />
           </div>
           <div className="field">
             <label htmlFor="cognomeBambino">Cognome <span className="req">*</span></label>
-            <input id="cognomeBambino" type="text" autoComplete="off" value={form.cognomeBambino} onChange={set('cognomeBambino')} required />
+            <input id="cognomeBambino" maxLength={60} type="text" autoComplete="off" value={form.cognomeBambino} onChange={set('cognomeBambino')} required />
           </div>
         </div>
         <div className="field">
