@@ -172,7 +172,7 @@ export default function PublicRegistration() {
         <h2 className="form-section">Consenso foto e video</h2>
         <p className="hint" style={{ marginTop: -8 }}>
           Durante le attività potremmo scattare foto e girare video. Autorizzi la pubblicazione
-          di immagini in cui compare tuo figlio/a sui canali social e sul sito della parrocchia?
+          di immagini in cui compare tuo figlio/a sui canali social della parrocchia?
         </p>
         <div className="choices">
           <label className={`choice${consensoFoto === true ? ' choice--selected' : ''}`}>
