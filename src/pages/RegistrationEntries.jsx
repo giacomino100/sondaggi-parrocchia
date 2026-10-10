@@ -9,6 +9,19 @@ function formatDate(iso) {
   return `${d}/${m}/${y}`
 }
 
+// Minuscolo e senza accenti, così "nicolo" trova anche "Nicolò"
+function normalizza(s) {
+  return String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
+function corrisponde(entry, ricerca) {
+  const testo = normalizza([
+    entry.nomeBambino, entry.cognomeBambino, entry.nomeGenitore, entry.cognomeGenitore,
+    entry.cellulare, entry.email, entry.indirizzo,
+  ].join(' '))
+  return normalizza(ricerca).split(/\s+/).filter(Boolean).every((parola) => testo.includes(parola))
+}
+
 function csvCell(value) {
   const s = String(value ?? '')
   return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
@@ -80,12 +93,14 @@ export default function RegistrationEntries() {
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showQr, setShowQr] = useState(false)
   const [copiato, setCopiato] = useState(false)
+  const [ricerca, setRicerca] = useState('')
 
   useEffect(() => watchRegistration(registrationId, setRegistration), [registrationId])
   useEffect(() => watchEntries(registrationId, setEntries), [registrationId])
 
   const url = `${window.location.origin}/i/${registrationId}`
   const conFoto = entries.filter((e) => e.consensoFoto).length
+  const filtrati = entries.filter((e) => corrisponde(e, ricerca))
 
   async function copiaLink() {
     try {
@@ -153,11 +168,31 @@ export default function RegistrationEntries() {
 
             <h2 className="section-title" style={{ fontSize: '1.05rem' }}>Elenco iscritti</h2>
 
+            {entries.length > 0 && (
+              <div className="iscr-ricerca">
+                <input
+                  className="input"
+                  type="search"
+                  placeholder="Cerca per nome, cognome, genitore, telefono o email…"
+                  aria-label="Cerca iscritti"
+                  value={ricerca}
+                  onChange={(ev) => setRicerca(ev.target.value)}
+                />
+                {ricerca.trim() && (
+                  <span className="muted iscr-ricerca__conteggio">
+                    {filtrati.length} di {entries.length} iscritti
+                  </span>
+                )}
+              </div>
+            )}
+
             {entries.length === 0 ? (
               <p className="muted">Ancora nessun iscritto.</p>
+            ) : filtrati.length === 0 ? (
+              <p className="muted">Nessun iscritto corrisponde alla ricerca.</p>
             ) : (
               <ul className="iscr-elenco">
-                {entries.map((e) => (
+                {filtrati.map((e) => (
                   <li key={e.id} className="iscr-riga">
                     <div className="iscr-riga__head">
                       <div>

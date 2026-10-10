@@ -1163,6 +1163,16 @@ a {
 }
 
 /* ===== Elenco iscritti ===== */
+.iscr-ricerca {
+  margin-bottom: 12px;
+}
+
+.iscr-ricerca__conteggio {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
+
 .iscr-elenco {
   list-style: none;
   margin: 0;
